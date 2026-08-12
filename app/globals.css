@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  --font-display: "Poppins", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  @apply bg-white text-ink font-body;
+}
+
+/* Botón con acabado "glossy" reutilizable en todo el sitio */
+.btn-glossy {
+  @apply relative overflow-hidden font-semibold rounded-lg transition
+         hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:brightness-95;
+}
+.btn-glossy::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
