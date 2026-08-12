@@ -1,10 +1,12 @@
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
-import { getFeaturedProducts, categories } from "@/data/products";
+import { getFeaturedProducts, getCategories } from "@/lib/products";
 import Link from "next/link";
 
-export default function HomePage() {
-  const featured = getFeaturedProducts();
+export const dynamic = "force-dynamic"; // siempre trae los productos más recientes del panel
+
+export default async function HomePage() {
+  const [featured, categories] = await Promise.all([getFeaturedProducts(), getCategories()]);
 
   return (
     <main>
@@ -26,7 +28,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-.
+
       {featured.length > 0 && (
         <section className="max-w-6xl mx-auto px-5 py-6 pb-16">
           <div className="flex items-center gap-3 mb-6">

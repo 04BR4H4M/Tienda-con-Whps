@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { categories } from "@/data/products";
+import { useCatalog } from "@/context/CatalogContext";
 import { useCart } from "@/context/CartContext";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { categories } = useCatalog();
   const { items, open } = useCart();
   const count = Object.values(items).reduce((s, q) => s + q, 0);
 
@@ -40,7 +41,10 @@ export default function Header() {
           >
             🛍️
             {count > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary-dark text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+              <span
+                className="absolute -top-1 -right-1 bg-primary-dark text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white"
+                aria-live="polite"
+              >
                 {count}
               </span>
             )}

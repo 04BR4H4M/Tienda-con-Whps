@@ -1,12 +1,26 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { useCatalog } from "@/context/CatalogContext";
 import { formatCOP } from "@/lib/format";
 import { buildWhatsAppOrderUrl } from "@/lib/whatsapp";
 
 export default function CartDrawer() {
   const { items, changeQty, isOpen, close } = useCart();
+  const { products } = useCatalog();
+  const panelRef = useRef(null);
+
+  // Cerrar con Escape y devolver el foco al panel al abrir (accesibilidad)
+  useEffect(() => {
+    if (!isOpen) return;
+    panelRef.current?.focus();
+    function onKeyDown(e) {
+      if (e.key === "Escape") close();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, close]);
 
   const lineItems = Object.entries(items)
     .map(([id, qty]) => ({ product: products.find((p) => p.id === Number(id)), qty }))
@@ -28,7 +42,12 @@ export default function CartDrawer() {
         onClick={close}
       />
       <aside
-        className={`fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Tu bolsa de compras"
+        tabIndex={-1}
+        className={`fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 outline-none ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

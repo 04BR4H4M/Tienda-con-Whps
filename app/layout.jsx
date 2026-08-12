@@ -1,5 +1,6 @@
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { CatalogProvider } from "@/context/CatalogContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
@@ -20,12 +21,14 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <CartProvider>
-          <Header />
-          {children}
-          <Footer />
-          <CartDrawer />
-        </CartProvider>
+        <CatalogProvider>
+          <CartProvider>
+            <Header />
+            {children}
+            <Footer />
+            <CartDrawer />
+          </CartProvider>
+        </CatalogProvider>
       </body>
     </html>
   );

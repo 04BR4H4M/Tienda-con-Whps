@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { categories } from "@/data/products";
 
-export default function CategoryFilters({ active }) {
+export default function CategoryFilters({ active, categories }) {
   const isActive = (slug) => (slug === "todos" ? !active || active === "todos" : active === slug);
 
   return (

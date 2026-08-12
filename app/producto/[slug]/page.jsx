@@ -1,20 +1,20 @@
 import { notFound } from "next/navigation";
 import Carousel from "@/components/Carousel";
 import AddToCartBox from "@/components/AddToCartBox";
-import { getProductBySlug, products } from "@/data/products";
+import { getProductBySlug } from "@/lib/products";
 import { formatCOP } from "@/lib/format";
 
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic"; // siempre trae el producto más reciente del panel
 
-export function generateMetadata({ params }) {
-  const product = getProductBySlug(params.slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
   return { title: product ? `${product.name} — Tallo & Cera` : "Producto no encontrado" };
 }
 
-export default function ProductoPage({ params }) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductoPage({ params }) {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
   return (
