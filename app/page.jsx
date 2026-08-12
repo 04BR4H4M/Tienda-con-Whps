@@ -26,7 +26,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
+.
       {featured.length > 0 && (
         <section className="max-w-6xl mx-auto px-5 py-6 pb-16">
           <div className="flex items-center gap-3 mb-6">
