@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "@/components/admin/LogoutButton";
 
-export const metadata = { title: "Panel administrativo — Tallo & Cera" };
+export const metadata = { title: "Panel administrativo" };
 
 export default async function AdminLayout({ children }) {
   const supabase = await createClient();
@@ -15,7 +15,7 @@ export default async function AdminLayout({ children }) {
       <header className="bg-white border-b border-black/5">
         <div className="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
           <Link href="/admin" className="font-display font-extrabold text-lg text-primary-dark">
-            Panel · Tallo &amp; Cera
+            Panel · Administrativo
           </Link>
           <div className="flex items-center gap-4 text-sm">
             <Link href="/admin/configuracion" className="text-ink-soft hover:text-ink font-semibold">

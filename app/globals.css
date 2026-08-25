@@ -27,7 +27,7 @@ body {
 
 /* Elemento de firma: un pequeño divisor en forma de gota de cera, usado
    bajo los títulos de sección en vez de una simple línea. Referencia
-   directa al nombre de la marca (Tallo & Cera). */
+   directa al nombre de la marca. */
 .wax-divider {
   width: 34px;
   height: 14px;

@@ -35,7 +35,6 @@ export default function LoginPage() {
         className="bg-white rounded-xl shadow-card p-8 w-full max-w-sm"
       >
         <h1 className="font-display font-extrabold text-2xl mb-1">Panel administrativo</h1>
-        <p className="text-sm text-ink-soft mb-6">Tallo &amp; Cera</p>
 
         <label className="block text-sm font-semibold mb-1" htmlFor="email">
           Correo
