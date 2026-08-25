@@ -4,12 +4,12 @@
 
 html {
   scroll-behavior: smooth;
-  --font-display: "Poppins", sans-serif;
+  --font-display: "Fraunces", serif;
   --font-body: "Inter", sans-serif;
 }
 
 body {
-  @apply bg-white text-ink font-body;
+@apply bg-surface text-ink font-body;
 }
 
 /* Botón con acabado "glossy" reutilizable en todo el sitio */
@@ -23,4 +23,15 @@ body {
   inset: 0 0 50% 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
   pointer-events: none;
+}
+
+/* Elemento de firma: un pequeño divisor en forma de gota de cera, usado
+   bajo los títulos de sección en vez de una simple línea. Referencia
+   directa al nombre de la marca (Tallo & Cera). */
+.wax-divider {
+  width: 34px;
+  height: 14px;
+}
+.wax-divider path {
+  fill: currentColor;
 }

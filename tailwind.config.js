@@ -8,19 +8,19 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          light: "#12A377",
-          DEFAULT: "#0E7C5A",
-          dark: "#0A5C43",
+          light: "#3A5F45",
+          DEFAULT: "#1E3B2A",
+          dark: "#12261A",
         },
         accent: {
-          DEFAULT: "#FFB100",
-          dark: "#D99400",
+          DEFAULT: "#B8860B",
+          dark: "#8F6A08",
         },
         ink: {
-          DEFAULT: "#12141A",
-          soft: "#5B5F6B",
+          DEFAULT: "#211D14",
+          soft: "#6B6353",
         },
-        surface: "#F3F4F7",
+        surface: "#F6EEDD",
         whatsapp: {
           DEFAULT: "#20BD5A",
           dark: "#12A34C",

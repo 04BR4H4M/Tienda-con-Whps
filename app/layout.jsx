@@ -1,16 +1,22 @@
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
-import { CatalogProvider } from "@/context/CatalogContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import { getSiteSettings } from "@/lib/site-settings";
+import { getCategories } from "@/lib/catalog";
 
-export const metadata = {
-  title: "Tallo & Cera — Jabones y velas hechos a mano",
-  description: "Catálogo de jabones y velas naturales. Arma tu pedido y envíalo por WhatsApp.",
-};
+export async function generateMetadata() {
+  const settings = await getSiteSettings();
+  return {
+    title: `${settings.site_name} — Jabones y velas hechos a mano`,
+    description: settings.tagline,
+  };
+}
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const [settings, categories] = await Promise.all([getSiteSettings(), getCategories()]);
+
   return (
     <html lang="es">
       <head>
@@ -21,14 +27,12 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <CatalogProvider>
-          <CartProvider>
-            <Header />
-            {children}
-            <Footer />
-            <CartDrawer />
-          </CartProvider>
-        </CatalogProvider>
+        <CartProvider>
+          <Header siteName={settings.site_name} categories={categories} />
+          {children}
+          <Footer settings={settings} />
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

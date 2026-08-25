@@ -11,7 +11,7 @@ export default function ProductCard({ product }) {
   return (
     <div className="group bg-white border border-black/5 rounded-xl overflow-hidden hover:shadow-card hover:-translate-y-1 transition">
       <Link href={`/producto/${product.slug}`} className="block">
-        <div className="relative aspect-square bg-surface">
+        <div className="relative aspect-square bg-white">
           {product.badge && (
             <span className="absolute top-2 left-2 z-10 bg-accent text-ink text-[11px] font-bold px-2 py-1 rounded">
               {product.badge}
@@ -34,7 +34,7 @@ export default function ProductCard({ product }) {
         <div className="flex items-center justify-between mt-3">
           <span className="font-extrabold text-primary-dark">{formatCOP(product.price)}</span>
           <button
-            onClick={() => addItem(product.id)}
+            onClick={() => addItem(product)}
             className="btn-glossy text-xs font-bold px-3 py-2 rounded-lg text-white bg-gradient-to-b from-primary-light via-primary to-primary-dark shadow-glossy"
           >
             Agregar

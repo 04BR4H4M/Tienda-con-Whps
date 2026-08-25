@@ -1,5 +1,5 @@
 -- ============================================================
--- Tallo & Cera — Esquema de base de datos para Supabase
+--  Esquema de base de datos para Supabase
 -- Copia y pega TODO este archivo en: Supabase → SQL Editor → New query → Run
 -- ============================================================
 
@@ -70,8 +70,38 @@ create policy "Solo admins pueden ver productos inactivos"
   using (true);
 
 -- ============================================================
--- 5. Storage: bucket público para las fotos de producto
---    (Esto también se puede hacer desde la UI: Storage → New bucket → "productos" → Public)
+-- 6. Configuración del sitio (nombre, textos del hero, imagen)
+--    Es una sola fila que edita el panel en /admin/configuracion.
+-- ============================================================
+create table if not exists site_settings (
+  id int primary key default 1,
+  site_name text not null default '',
+  tagline text not null default 'Jabones y velas hechos a mano en Bogotá.',
+  hero_eyebrow text not null default 'Hecho a mano · Bogotá',
+  hero_title text not null default 'Jabones y velas que transforman tu espacio',
+  hero_subtitle text not null default 'Ingredientes naturales, aromas exclusivos y un pedido tan simple como escribirnos por WhatsApp.',
+  hero_cta_label text not null default 'Ver catálogo',
+  hero_image text,
+  whatsapp_footer text not null default '+57 300 111 2233',
+  contact_email text not null default 'hola@talloycera.com',
+  constraint single_row check (id = 1)
+);
+
+insert into site_settings (id) values (1) on conflict (id) do nothing;
+
+alter table site_settings enable row level security;
+
+create policy "Configuración visible para todos"
+  on site_settings for select
+  using (true);
+
+create policy "Solo admins pueden editar la configuración"
+  on site_settings for update
+  to authenticated
+  using (id = 1);
+
+-- ============================================================
+-- 7. Storage: bucket público para las fotos de producto y del hero
 -- ============================================================
 insert into storage.buckets (id, name, public)
 values ('productos', 'productos', true)

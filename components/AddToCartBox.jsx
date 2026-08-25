@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 
-export default function AddToCartBox({ productId }) {
+export default function AddToCartBox({ product }) {
   const [qty, setQty] = useState(1);
   const { addItem } = useCart();
 
@@ -26,7 +26,7 @@ export default function AddToCartBox({ productId }) {
       </div>
 
       <button
-        onClick={() => addItem(productId, qty)}
+        onClick={() => addItem(product, qty)}
         className="btn-glossy w-full mt-4 py-3.5 rounded-lg font-bold text-white bg-gradient-to-b from-primary-light via-primary to-primary-dark shadow-glossy"
       >
         Agregar a la bolsa

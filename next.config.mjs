@@ -1,12 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    // Mientras conectamos Supabase Storage / Cloudinary, permitimos
+    // imágenes de placeholder para maquetar el catálogo.
     remotePatterns: [
-      // Fotos de producto subidas desde el panel, guardadas en Supabase Storage.
-      { protocol: "https", hostname: "*.supabase.co" },
-      // Se puede quitar una vez que ya no queden productos de ejemplo con
-      // imágenes de placeholder.
       { protocol: "https", hostname: "placehold.co" },
+      { protocol: "https", hostname: "*.supabase.co" },
     ],
   },
 };

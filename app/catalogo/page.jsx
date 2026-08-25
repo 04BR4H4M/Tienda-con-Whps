@@ -1,19 +1,16 @@
 import CategoryFilters from "@/components/CategoryFilters";
 import ProductGrid from "@/components/ProductGrid";
-import { getProducts, getCategories } from "@/lib/products";
+import { getProducts, getCategories } from "@/lib/catalog";
 
-export const metadata = { title: "Catálogo — Tallo & Cera" };
-export const dynamic = "force-dynamic"; // siempre trae los productos más recientes del panel
+export const metadata = { title: "Catálogo" };
+export const revalidate = 0; // siempre trae lo último del panel de administrador
 
 export default async function CatalogoPage({ searchParams }) {
-  const params = await searchParams;
-  const active = params?.categoria || "todos";
-
+  const active = searchParams?.categoria || "todos";
   const [items, categories] = await Promise.all([
     getProducts({ category: active }),
     getCategories(),
   ]);
-
   const label =
     active === "todos" ? "Todos los productos" : categories.find((c) => c.slug === active)?.label;
 

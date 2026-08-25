@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useCatalog } from "@/context/CatalogContext";
 import { useCart } from "@/context/CartContext";
 
-export default function Header() {
+export default function Header({ siteName, categories = [] }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { categories } = useCatalog();
   const { items, open } = useCart();
   const count = Object.values(items).reduce((s, q) => s + q, 0);
 
@@ -15,7 +13,7 @@ export default function Header() {
     <header className="sticky top-0 z-30 bg-white border-b border-black/5">
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
         <Link href="/" className="font-display font-extrabold text-xl tracking-tight text-primary-dark">
-          Tallo &amp; Cera
+          {siteName}
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-semibold">
@@ -41,10 +39,7 @@ export default function Header() {
           >
             🛍️
             {count > 0 && (
-              <span
-                className="absolute -top-1 -right-1 bg-primary-dark text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white"
-                aria-live="polite"
-              >
+              <span className="absolute -top-1 -right-1 bg-primary-dark text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
                 {count}
               </span>
             )}

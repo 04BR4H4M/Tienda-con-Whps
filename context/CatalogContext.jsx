@@ -2,17 +2,27 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-const CatalogContext = createContext({ products: [], categories: [], loading: true });
+const CatalogContext = createContext({
+  products: [],
+  categories: [],
+  settings: null,
+  loading: true,
+});
 
 export function CatalogProvider({ children }) {
-  const [state, setState] = useState({ products: [], categories: [], loading: true });
+  const [state, setState] = useState({
+    products: [],
+    categories: [],
+    settings: null,
+    loading: true,
+  });
 
   useEffect(() => {
     let cancelled = false;
     fetch("/api/catalog")
       .then((res) => res.json())
-      .then(({ products, categories }) => {
-        if (!cancelled) setState({ products, categories, loading: false });
+      .then(({ products, categories, settings }) => {
+        if (!cancelled) setState({ products, categories, settings, loading: false });
       })
       .catch((err) => {
         console.error("Error cargando catálogo:", err);

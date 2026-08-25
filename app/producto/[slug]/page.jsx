@@ -1,20 +1,18 @@
 import { notFound } from "next/navigation";
 import Carousel from "@/components/Carousel";
 import AddToCartBox from "@/components/AddToCartBox";
-import { getProductBySlug } from "@/lib/products";
+import { getProductBySlug } from "@/lib/catalog";
 import { formatCOP } from "@/lib/format";
 
-export const dynamic = "force-dynamic"; // siempre trae el producto más reciente del panel
+export const revalidate = 0; // siempre trae lo último del panel de administrador
 
 export async function generateMetadata({ params }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
-  return { title: product ? `${product.name} — Tallo & Cera` : "Producto no encontrado" };
+  const product = await getProductBySlug(params.slug);
+  return { title: product ? product.name : "Producto no encontrado" };
 }
 
 export default async function ProductoPage({ params }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getProductBySlug(params.slug);
   if (!product) notFound();
 
   return (
@@ -32,7 +30,7 @@ export default async function ProductoPage({ params }) {
             {formatCOP(product.price)}
           </p>
 
-          <AddToCartBox productId={product.id} />
+          <AddToCartBox product={product} />
         </div>
       </div>
     </main>

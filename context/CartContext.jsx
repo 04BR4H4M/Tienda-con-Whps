@@ -6,11 +6,13 @@ const CartContext = createContext(null);
 const STORAGE_KEY = "tienda-whatsapp:cart";
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState({}); // { [productId]: qty }
+  // items: { [productId]: { product, qty } }
+  // Se guarda el producto completo (no solo el id) para no depender
+  // de un catálogo fijo en el código al momento de armar el pedido.
+  const [items, setItems] = useState({});
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
-  // Cargar el carrito guardado en el navegador del cliente
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -21,21 +23,30 @@ export function CartProvider({ children }) {
     setHydrated(true);
   }, []);
 
-  // Guardar cada vez que cambia
   useEffect(() => {
     if (!hydrated) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, hydrated]);
 
-  function addItem(productId, qty = 1) {
-    setItems((prev) => ({ ...prev, [productId]: (prev[productId] || 0) + qty }));
+  function addItem(product, qty = 1) {
+    setItems((prev) => {
+      const existingQty = prev[product.id]?.qty || 0;
+      return { ...prev, [product.id]: { product, qty: existingQty + qty } };
+    });
     setIsOpen(true);
   }
 
   function changeQty(productId, delta) {
     setItems((prev) => {
-      const next = { ...prev, [productId]: (prev[productId] || 0) + delta };
-      if (next[productId] <= 0) delete next[productId];
+      const current = prev[productId];
+      if (!current) return prev;
+      const nextQty = current.qty + delta;
+      const next = { ...prev };
+      if (nextQty <= 0) {
+        delete next[productId];
+      } else {
+        next[productId] = { ...current, qty: nextQty };
+      }
       return next;
     });
   }
