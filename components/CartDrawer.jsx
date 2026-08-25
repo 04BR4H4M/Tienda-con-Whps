@@ -5,7 +5,7 @@ import { formatCOP } from "@/lib/format";
 import { buildWhatsAppOrderUrl } from "@/lib/whatsapp";
 
 export default function CartDrawer() {
-  const { items, changeQty, isOpen, close } = useCart();
+  const { items, changeQty, clearCart, isOpen, close } = useCart();
 
   const lineItems = Object.values(items); // [{ product, qty }]
   const total = lineItems.reduce((sum, l) => sum + l.product.price * l.qty, 0);
@@ -13,6 +13,8 @@ export default function CartDrawer() {
   function sendOrder() {
     if (lineItems.length === 0) return;
     window.open(buildWhatsAppOrderUrl(lineItems), "_blank");
+    // El pedido ya se envió por WhatsApp: vaciamos la bolsa para la próxima visita.
+    clearCart();
   }
 
   return (
@@ -30,9 +32,19 @@ export default function CartDrawer() {
       >
         <div className="flex items-center justify-between p-5 border-b border-black/5">
           <h2 className="font-display font-extrabold text-lg">Tu bolsa</h2>
-          <button onClick={close} className="text-ink-soft text-lg">
-            ✕
-          </button>
+          <div className="flex items-center gap-4">
+            {lineItems.length > 0 && (
+              <button
+                onClick={clearCart}
+                className="text-xs font-semibold text-ink-soft hover:text-red-600"
+              >
+                Vaciar
+              </button>
+            )}
+            <button onClick={close} className="text-ink-soft text-lg" aria-label="Cerrar bolsa">
+              ✕
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5">

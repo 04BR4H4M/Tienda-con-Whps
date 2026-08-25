@@ -26,6 +26,7 @@ export default function ProductForm({ mode, product, categories }) {
   const [shortDesc, setShortDesc] = useState(product?.short_desc || "");
   const [description, setDescription] = useState(product?.description || "");
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
+  const [isFeatured, setIsFeatured] = useState(product?.is_featured ?? false);
   const [images, setImages] = useState(product?.images || []);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -91,6 +92,7 @@ export default function ProductForm({ mode, product, categories }) {
       description: description.trim() || null,
       images,
       is_active: isActive,
+      is_featured: isFeatured,
     };
 
     const { error: saveError } =
@@ -253,6 +255,15 @@ export default function ProductForm({ mode, product, categories }) {
       <label className="flex items-center gap-2 text-sm font-semibold">
         <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
         Visible en la tienda
+      </label>
+
+      <label className="flex items-center gap-2 text-sm font-semibold">
+        <input
+          type="checkbox"
+          checked={isFeatured}
+          onChange={(e) => setIsFeatured(e.target.checked)}
+        />
+        Mostrar en "Destacados" del inicio
       </label>
 
       {error && <p className="text-red-600 text-sm">{error}</p>}

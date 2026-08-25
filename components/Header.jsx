@@ -7,7 +7,7 @@ import { useCart } from "@/context/CartContext";
 export default function Header({ siteName, categories = [] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { items, open } = useCart();
-  const count = Object.values(items).reduce((s, q) => s + q, 0);
+  const count = Object.values(items).reduce((s, i) => s + i.qty, 0);
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-black/5">

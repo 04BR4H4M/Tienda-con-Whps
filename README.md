@@ -1,9 +1,10 @@
-# Tallo & Cera — Tienda vía WhatsApp
+# Tienda vía WhatsApp
 
 Proyecto en **Next.js 14 + Tailwind CSS + Supabase**. Catálogo, filtros, ficha
 de producto con carrusel, bolsa/carrito, envío del pedido por WhatsApp — y un
-**panel administrativo en `/admin`** desde donde se agregan, editan y eliminan
-productos (nombre, foto, precio, categoría) sin tocar código.
+**panel administrativo en `/admin`** desde donde se controla todo: nombre de
+la tienda, textos e imagen de la portada, categorías (foto y frase) y
+productos (nombre, foto, precio, destacados), sin tocar código.
 
 ## Estructura
 
@@ -13,24 +14,38 @@ app/
   page.jsx                       # Home (hero + categorías + destacados)
   catalogo/page.jsx               # Catálogo con filtro por categoría (?categoria=velas)
   producto/[slug]/page.jsx        # Ficha de producto con carrusel
-  api/catalog/route.js            # Endpoint público que alimenta el carrito/header
   admin/login/page.jsx            # Login del panel
   admin/(dashboard)/page.jsx      # Lista de productos, con editar/eliminar
   admin/(dashboard)/productos/... # Formularios de crear/editar producto
+  admin/(dashboard)/categorias/   # Foto y frase de cada categoría
+  admin/(dashboard)/configuracion/# Nombre de la tienda y textos de la portada
 
 components/                # Header, Footer, Hero, ProductCard, ProductGrid,
                             # CategoryFilters, Carousel, CartDrawer, AddToCartBox
-components/admin/          # ProductForm, DeleteProductButton, LogoutButton
+components/admin/          # ProductForm, CategoryForm, NewCategoryForm,
+                            # SettingsForm, DeleteProductButton, LogoutButton
 
 context/CartContext.jsx    # Estado global del carrito (persistido en localStorage)
-context/CatalogContext.jsx # Productos/categorías cargados desde /api/catalog
-lib/products.js            # Lectura de productos/categorías desde Supabase
-lib/supabase/               # Clientes de Supabase (navegador y servidor)
+lib/catalog.js             # Lectura de productos/categorías desde Supabase (público)
+lib/site-settings.js       # Lectura de la configuración del sitio (público)
+lib/supabase.js            # Cliente de Supabase para lecturas públicas (sin sesión)
+lib/supabase/               # Clientes de Supabase para el panel (con sesión de admin)
 lib/format.js              # Formato de moneda (COP)
 lib/whatsapp.js            # Arma el link wa.me con el pedido
 middleware.js               # Protege /admin: sin sesión, redirige al login
 supabase/schema.sql         # Tablas, seguridad (RLS) y bucket de imágenes
 ```
+
+> **Nota para quien siga editando este proyecto:** las páginas públicas
+> (`app/page.jsx`, `app/catalogo/...`, `app/producto/...`) leen datos con
+> `lib/catalog.js` y `lib/site-settings.js`, usando el cliente público de
+> `lib/supabase.js` (sin sesión — la seguridad la da directamente Supabase
+> con RLS). Las páginas de `/admin` usan en cambio `lib/supabase/client.js`
+> y `lib/supabase/server.js`, que sí manejan la sesión del administrador
+> (necesaria para poder editar). Son dos caminos distintos a propósito —
+> evita crear un tercer archivo de datos "por si acaso"; si algo no
+> aparece en el sitio, es casi seguro que el archivo que hay que tocar es
+> uno de estos dos, no uno nuevo.
 
 ## 1. Crear el proyecto de Supabase (una sola vez)
 
@@ -39,14 +54,17 @@ supabase/schema.sql         # Tablas, seguridad (RLS) y bucket de imágenes
    ej. `South America (São Paulo)`).
 3. Cuando el proyecto termine de crearse, ve a **SQL Editor → New query**, pega
    **todo** el contenido de [`supabase/schema.sql`](./supabase/schema.sql) y dale
-   **Run**. Esto crea las tablas `products` y `categories`, la seguridad (RLS) y
-   el bucket de imágenes `productos`.
+   **Run**. Esto crea las tablas, la seguridad (RLS) y el bucket de imágenes
+   `productos`. Es seguro volver a correr este archivo más adelante si se
+   actualiza (por ejemplo, si agregamos una columna nueva) — no borra datos.
 4. Ve a **Authentication → Users → Add user** y crea el usuario administrador
    (tu correo y una contraseña). Ese es el login del panel — no hay registro
    público, solo tú (o quien invites desde ahí) puede entrar a `/admin`.
-5. Ve a **Project Settings → API** y copia:
-   - **Project URL**
-   - **anon public key**
+5. Ve a **Project Settings → API Keys** y copia:
+   - **Project URL** (en la pestaña "Data API" de esa misma sección)
+   - **Publishable key** (empieza con `sb_publishable_...`; es el reemplazo
+     moderno de la antigua "anon key" — cumple la misma función y es segura
+     para el navegador)
 
 ## 2. Instalación local (en VS Code)
 
@@ -68,7 +86,7 @@ Abre `.env.local` y completa:
 ```
 NEXT_PUBLIC_WHATSAPP_NUMBER=tu número real, sin "+"
 NEXT_PUBLIC_SUPABASE_URL=el Project URL que copiaste
-NEXT_PUBLIC_SUPABASE_ANON_KEY=la anon public key que copiaste
+NEXT_PUBLIC_SUPABASE_ANON_KEY=la Publishable key que copiaste
 ```
 
 ```bash
@@ -81,21 +99,24 @@ para el panel (te pedirá el correo/contraseña que creaste en el paso 1.4).
 
 ## 3. Qué se administra desde `/admin` (sin tocar código)
 
-- **Agregar producto**: nombre, categoría, precio, etiqueta, descripciones y
-  fotos (se suben directo a Supabase Storage arrastrando o seleccionando el
-  archivo).
-- **Editar producto**: mismos campos, incluye poder ocultarlo de la tienda
-  sin borrarlo (casilla "Visible en la tienda").
-- **Eliminar producto**: botón con confirmación.
+- **Configuración**: nombre de la tienda, frase corta, correo y WhatsApp de
+  contacto, y todos los textos + la foto de la portada.
+- **Categorías**: foto y frase de cada una (se muestran en las tarjetas del
+  inicio), además de crear categorías nuevas.
+- **Productos**: nombre, categoría, precio, etiqueta, descripciones, fotos
+  (arrastrando o seleccionando el archivo), marcarlo como **Destacado**
+  (aparece en la sección "Destacados" del inicio), ocultarlo sin borrarlo, o
+  eliminarlo.
+
+Mientras un producto o categoría no tenga foto propia, se muestra un
+placeholder de color generado localmente (no depende de ningún servicio
+externo, así que nunca da error de red).
 
 Lo único que hoy todavía se edita por código:
 
-- **Número de WhatsApp**: variable `NEXT_PUBLIC_WHATSAPP_NUMBER` (en `.env.local`
-  o en Vercel).
-- **Categorías** (`Jabones`, `Velas`, `Otros`): se crean por SQL en el paso 1.3.
-  Agregar o renombrar categorías nuevas se hace directo en Supabase
-  (**Table Editor → categories**) — si quieres que también se administren
-  desde el panel visualmente, dímelo y lo agrego.
+- **Número de WhatsApp para recibir pedidos**: variable
+  `NEXT_PUBLIC_WHATSAPP_NUMBER` (en `.env.local` o en Vercel). El WhatsApp
+  que se *muestra* en el pie de página sí se edita desde Configuración.
 - **Colores de marca**: en `tailwind.config.js`, dentro de `theme.extend.colors`.
 
 ## 4. Desplegarlo gratis en Vercel

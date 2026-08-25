@@ -8,8 +8,14 @@ create table if not exists categories (
   id bigint generated always as identity primary key,
   slug text not null unique,
   label text not null,
+  tagline text,
+  image text,
   sort_order int not null default 0
 );
+
+-- Por si esta tabla ya existía de una instalación anterior sin estas columnas.
+alter table categories add column if not exists tagline text;
+alter table categories add column if not exists image text;
 
 -- 2. Tabla de productos
 create table if not exists products (
@@ -23,9 +29,14 @@ create table if not exists products (
   description text,
   images text[] not null default '{}',
   is_active boolean not null default true,
+  is_featured boolean not null default false,
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- Por si esta tabla ya existía de una instalación anterior sin esta columna.
+-- Permite marcar un producto para que aparezca en "Destacados" del home.
+alter table products add column if not exists is_featured boolean not null default false;
 
 -- 3. Categorías iniciales (puedes editarlas luego desde el panel más adelante,
 --    por ahora se crean directo por SQL una sola vez)
@@ -75,7 +86,7 @@ create policy "Solo admins pueden ver productos inactivos"
 -- ============================================================
 create table if not exists site_settings (
   id int primary key default 1,
-  site_name text not null default '',
+  site_name text not null default 'Mi Tienda',
   tagline text not null default 'Jabones y velas hechos a mano en Bogotá.',
   hero_eyebrow text not null default 'Hecho a mano · Bogotá',
   hero_title text not null default 'Jabones y velas que transforman tu espacio',
@@ -88,6 +99,11 @@ create table if not exists site_settings (
 );
 
 insert into site_settings (id) values (1) on conflict (id) do nothing;
+
+-- Corrige instalaciones anteriores que hayan quedado con el nombre vacío
+-- (versión previa de este archivo), sin pisar un nombre que ya hayas puesto
+-- tú desde el panel.
+update site_settings set site_name = 'Mi Tienda' where id = 1 and coalesce(site_name, '') = '';
 
 alter table site_settings enable row level security;
 
@@ -120,3 +136,5 @@ create policy "Solo admins pueden borrar fotos"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'productos');
+
+NOTIFY pgrst, 'reload schema';
