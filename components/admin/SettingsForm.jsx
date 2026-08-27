@@ -14,7 +14,15 @@ export default function SettingsForm({ settings }) {
   const [heroTitle, setHeroTitle] = useState(settings.hero_title);
   const [heroSubtitle, setHeroSubtitle] = useState(settings.hero_subtitle);
   const [heroCtaLabel, setHeroCtaLabel] = useState(settings.hero_cta_label);
-  const [heroImage, setHeroImage] = useState(settings.hero_image || "");
+  // Compatibilidad: si venía de la versión con una sola foto (hero_image),
+  // la mostramos como primera foto del carrusel.
+  const [heroImages, setHeroImages] = useState(
+    settings.hero_images?.length > 0
+      ? settings.hero_images
+      : settings.hero_image
+        ? [settings.hero_image]
+        : []
+  );
   const [whatsappFooter, setWhatsappFooter] = useState(settings.whatsapp_footer);
   const [contactEmail, setContactEmail] = useState(settings.contact_email);
 
@@ -23,27 +31,35 @@ export default function SettingsForm({ settings }) {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
 
-  async function handleImageUpload(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleImagesUpload(e) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
     setError("");
     setUploading(true);
 
     try {
-      const path = `hero-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]+/g, "-")}`;
-      const { error: uploadError } = await supabase.storage
-        .from("productos")
-        .upload(path, file, { cacheControl: "3600", upsert: false });
-      if (uploadError) throw uploadError;
+      const uploaded = [];
+      for (const file of files) {
+        const path = `hero-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]+/g, "-")}`;
+        const { error: uploadError } = await supabase.storage
+          .from("productos")
+          .upload(path, file, { cacheControl: "3600", upsert: false });
+        if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage.from("productos").getPublicUrl(path);
-      setHeroImage(data.publicUrl);
+        const { data } = supabase.storage.from("productos").getPublicUrl(path);
+        uploaded.push(data.publicUrl);
+      }
+      setHeroImages((prev) => [...prev, ...uploaded]);
     } catch (err) {
       setError("No se pudo subir la imagen: " + err.message);
     } finally {
       setUploading(false);
       e.target.value = "";
     }
+  }
+
+  function removeImage(url) {
+    setHeroImages((prev) => prev.filter((img) => img !== url));
   }
 
   async function handleSubmit(e) {
@@ -61,7 +77,8 @@ export default function SettingsForm({ settings }) {
         hero_title: heroTitle.trim(),
         hero_subtitle: heroSubtitle.trim(),
         hero_cta_label: heroCtaLabel.trim(),
-        hero_image: heroImage || null,
+        hero_images: heroImages,
+        hero_image: heroImages[0] || null, // se mantiene por compatibilidad
         whatsapp_footer: whatsappFooter.trim(),
         contact_email: contactEmail.trim(),
       })
@@ -185,43 +202,52 @@ export default function SettingsForm({ settings }) {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold mb-1">Foto de portada</label>
-        {heroImage && (
-          <div className="relative w-full max-w-xs aspect-video rounded-lg overflow-hidden border border-ink/10 mb-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={heroImage} alt="" className="w-full h-full object-cover" />
-            <button
-              type="button"
-              onClick={() => setHeroImage("")}
-              className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center"
-              aria-label="Quitar foto de portada"
-            >
-              ✕
-            </button>
+        <label className="block text-sm font-semibold mb-1">Fotos de portada (carrusel)</label>
+        <p className="text-xs text-ink-soft mb-2">
+          Si subes más de una, rotan solas cada pocos segundos en el inicio. Con una sola foto, la
+          portada queda fija. Sin ninguna, se muestra un fondo de color.
+        </p>
+        {heroImages.length > 0 && (
+          <div className="flex flex-wrap gap-3 mb-3">
+            {heroImages.map((url) => (
+              <div
+                key={url}
+                className="relative w-28 aspect-video rounded-lg overflow-hidden border border-ink/10"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeImage(url)}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white text-xs flex items-center justify-center"
+                  aria-label="Quitar esta foto"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
           </div>
         )}
-        <label className="inline-block text-sm font-semibold text-forest-dark border border-forest/30 rounded-lg px-4 py-2 cursor-pointer hover:bg-surface">
-          {uploading ? "Subiendo..." : heroImage ? "Cambiar foto" : "+ Subir foto de portada"}
+        <label className="inline-block text-sm font-semibold text-primary-dark border border-primary/30 rounded-lg px-4 py-2 cursor-pointer hover:bg-surface">
+          {uploading ? "Subiendo..." : "+ Agregar foto(s) de portada"}
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageUpload}
+            multiple
+            onChange={handleImagesUpload}
             disabled={uploading}
             className="hidden"
           />
         </label>
-        <p className="text-xs text-ink-soft mt-1">
-          Sin foto, la portada muestra un fondo verde con una textura decorativa.
-        </p>
       </div>
 
       {error && <p className="text-red-600 text-sm">{error}</p>}
-      {saved && !error && <p className="text-forest-dark text-sm font-semibold">Guardado ✓</p>}
+      {saved && !error && <p className="text-primary-dark text-sm font-semibold">Guardado ✓</p>}
 
       <button
         type="submit"
         disabled={saving || uploading}
-        className="btn-glossy bg-gradient-to-b from-forest-light to-forest-dark text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-glossy disabled:opacity-50"
+        className="btn-glossy bg-gradient-to-b from-primary-light to-primary-dark text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-glossy disabled:opacity-50"
       >
         {saving ? "Guardando..." : "Guardar cambios"}
       </button>

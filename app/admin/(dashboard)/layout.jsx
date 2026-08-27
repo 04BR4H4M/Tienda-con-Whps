@@ -18,6 +18,9 @@ export default async function AdminLayout({ children }) {
             Panel · Administrativo
           </Link>
           <div className="flex items-center gap-4 text-sm">
+            <Link href="/admin/categorias" className="text-ink-soft hover:text-ink font-semibold">
+              Categorías
+            </Link>
             <Link href="/admin/configuracion" className="text-ink-soft hover:text-ink font-semibold">
               Configuración
             </Link>

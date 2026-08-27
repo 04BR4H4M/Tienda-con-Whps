@@ -93,10 +93,16 @@ create table if not exists site_settings (
   hero_subtitle text not null default 'Ingredientes naturales, aromas exclusivos y un pedido tan simple como escribirnos por WhatsApp.',
   hero_cta_label text not null default 'Ver catálogo',
   hero_image text,
+  hero_images text[] not null default '{}',
   whatsapp_footer text not null default '+57 300 111 2233',
   contact_email text not null default 'hola@talloycera.com',
   constraint single_row check (id = 1)
 );
+
+-- Por si esta tabla ya existía de una instalación anterior sin esta columna.
+-- Ahora el hero admite varias fotos que rotan en carrusel; hero_image (una
+-- sola foto) se conserva por compatibilidad y se usa si hero_images está vacío.
+alter table site_settings add column if not exists hero_images text[] not null default '{}';
 
 insert into site_settings (id) values (1) on conflict (id) do nothing;
 

@@ -3,7 +3,7 @@
 Proyecto en **Next.js 14 + Tailwind CSS + Supabase**. Catálogo, filtros, ficha
 de producto con carrusel, bolsa/carrito, envío del pedido por WhatsApp — y un
 **panel administrativo en `/admin`** desde donde se controla todo: nombre de
-la tienda, textos e imagen de la portada, categorías (foto y frase) y
+la tienda, textos e imágenes (carrusel) de la portada, categorías (foto y frase) y
 productos (nombre, foto, precio, destacados), sin tocar código.
 
 ## Estructura
@@ -100,7 +100,8 @@ para el panel (te pedirá el correo/contraseña que creaste en el paso 1.4).
 ## 3. Qué se administra desde `/admin` (sin tocar código)
 
 - **Configuración**: nombre de la tienda, frase corta, correo y WhatsApp de
-  contacto, y todos los textos + la foto de la portada.
+  contacto, y todos los textos + las fotos de la portada (si subes más de una,
+  rotan solas en carrusel).
 - **Categorías**: foto y frase de cada una (se muestran en las tarjetas del
   inicio), además de crear categorías nuevas.
 - **Productos**: nombre, categoría, precio, etiqueta, descripciones, fotos

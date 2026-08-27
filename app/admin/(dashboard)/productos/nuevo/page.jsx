@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ProductForm from "@/components/admin/ProductForm";
 
@@ -12,7 +13,10 @@ export default async function NuevoProductoPage() {
 
   return (
     <div>
-      <h1 className="font-display font-extrabold text-2xl mb-6">Nuevo producto</h1>
+      <Link href="/admin" className="text-sm font-semibold text-primary-dark hover:underline">
+        ← Volver al panel
+      </Link>
+      <h1 className="font-display font-extrabold text-2xl mt-3 mb-6">Nuevo producto</h1>
       <ProductForm mode="create" categories={categories || []} />
     </div>
   );

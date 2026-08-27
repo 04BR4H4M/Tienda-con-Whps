@@ -1,4 +1,5 @@
-import { getSiteSettings } from "@/lib/settings";
+import Link from "next/link";
+import { getSiteSettings } from "@/lib/site-settings";
 import SettingsForm from "@/components/admin/SettingsForm";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,11 @@ export default async function ConfiguracionPage() {
 
   return (
     <div>
-      <h1 className="font-display italic font-medium text-2xl mb-1 text-forest-dark">
+      <Link href="/admin" className="text-sm font-semibold text-primary-dark hover:underline">
+        ← Volver al panel
+      </Link>
+
+      <h1 className="font-display font-extrabold text-2xl mt-3 mb-1 text-primary-dark">
         Configuración del sitio
       </h1>
       <p className="text-sm text-ink-soft mb-6">
