@@ -1,36 +1,5 @@
 "use client";
-
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
-
-export default function AddToCartBox({ product }) {
-  const [qty, setQty] = useState(1);
-  const { addItem } = useCart();
-
-  return (
-    <div className="mt-6">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => setQty((q) => Math.max(1, q - 1))}
-          className="w-9 h-9 rounded-lg bg-surface font-bold"
-        >
-          −
-        </button>
-        <span className="w-6 text-center font-semibold">{qty}</span>
-        <button
-          onClick={() => setQty((q) => q + 1)}
-          className="w-9 h-9 rounded-lg bg-surface font-bold"
-        >
-          +
-        </button>
-      </div>
-
-      <button
-        onClick={() => addItem(product, qty)}
-        className="btn-glossy w-full mt-4 py-3.5 rounded-lg font-bold text-white bg-gradient-to-b from-primary-light via-primary to-primary-dark shadow-glossy"
-      >
-        Agregar a la bolsa
-      </button>
-    </div>
-  );
-}
+import Icon from "@/components/Icon";
+export default function AddToCartBox({ product }) { const [qty,setQty]=useState(1); const {addItem}=useCart(); return <div className="mt-7"><div className="flex items-center justify-between"><span className="text-xs font-semibold">Cantidad</span><div className="flex items-center border border-black/[0.08] rounded-xl overflow-hidden"><button onClick={()=>setQty(q=>Math.max(1,q-1))} className="w-10 h-10 flex items-center justify-center hover:bg-surface"><Icon name="minus" size={14}/></button><span className="w-10 text-center text-sm font-semibold">{qty}</span><button onClick={()=>setQty(q=>q+1)} className="w-10 h-10 flex items-center justify-center hover:bg-surface"><Icon name="plus" size={14}/></button></div></div><button onClick={()=>addItem(product,qty)} className="btn-glossy w-full mt-4 py-3.5 rounded-xl font-bold text-white bg-primary shadow-glossy flex items-center justify-center gap-2"><Icon name="bag" size={17}/> Agregar al carrito</button></div>; }

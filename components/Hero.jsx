@@ -3,96 +3,72 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Icon from "@/components/Icon";
 
 export default function Hero({ settings }) {
-  const {
-    hero_eyebrow: eyebrow,
-    hero_title: title,
-    hero_subtitle: subtitle,
-    hero_cta_label: ctaLabel,
-    hero_image: legacyImage,
-    hero_images: heroImages,
-  } = settings;
-
-  // Compatibilidad: si no se han subido varias fotos (hero_images), pero sí
-  // existe la foto única de la versión anterior (hero_image), se usa esa.
+  const { hero_eyebrow: eyebrow, hero_title: title, hero_subtitle: subtitle, hero_cta_label: ctaLabel, hero_image: legacyImage, hero_images: heroImages } = settings;
   const images = heroImages?.length > 0 ? heroImages : legacyImage ? [legacyImage] : [];
-
   const [index, setIndex] = useState(0);
 
-  // Auto-avance del carrusel cada 5 segundos. Se pausa solo si hay una foto o ninguna.
   useEffect(() => {
     if (images.length <= 1) return;
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % images.length);
-    }, 5000);
+    const timer = setInterval(() => setIndex((i) => (i + 1) % images.length), 5000);
     return () => clearInterval(timer);
   }, [images.length]);
 
-  function goTo(i) {
-    setIndex(((i % images.length) + images.length) % images.length);
-  }
+  const isDefaultTitle = !title || title === "Jabones y velas que transforman tu espacio";
 
   return (
-    <section className="relative bg-gradient-to-br from-primary to-primary-dark text-white overflow-hidden">
-      {images.map((src, i) => (
-        <div
-          key={src + i}
-          className="absolute inset-0 transition-opacity duration-1000"
-          style={{ opacity: i === index ? 1 : 0 }}
-          aria-hidden={i !== index}
-        >
-          <Image src={src} alt="" fill priority={i === 0} className="object-cover" />
-        </div>
-      ))}
-      {images.length > 0 && (
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/90 via-primary-dark/50 to-primary-dark/30" />
-      )}
+    <section className="max-w-7xl mx-auto px-4 sm:px-5 lg:px-7 pt-4 md:pt-6">
+      <div className="relative overflow-hidden rounded-[28px] bg-[#FFF7F3] min-h-[430px] md:min-h-[470px] flex items-center">
+        <div className="absolute -left-16 -bottom-24 w-72 h-72 rounded-full bg-[#FDE2E4]/60 blur-2xl" />
+        <div className="absolute right-[34%] top-5 w-28 h-28 rounded-full bg-white/80 blur-xl" />
 
-      <div className="relative max-w-6xl mx-auto px-5 py-24 md:py-32 text-center md:text-left">
-        <p className="text-color3 font-bold text-xs tracking-[0.2em] uppercase mb-3">{eyebrow}</p>
-        <h1 className="font-display font-extrabold text-4xl md:text-5xl leading-tight max-w-2xl">
-          {title}
-        </h1>
-        <p className="mt-4 text-white/85 text-base max-w-md mx-auto md:mx-0">{subtitle}</p>
-        <Link
-          href="/catalogo"
-          className="btn-glossy inline-block mt-8 bg-gradient-to-b from-color4 to-rose text-white font-bold px-7 py-3.5 rounded-lg shadow-glossy"
-        >
-          {ctaLabel}
-        </Link>
-      </div>
-
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={() => goTo(index - 1)}
-            aria-label="Foto anterior"
-            className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/35 backdrop-blur items-center justify-center text-white text-xl transition"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => goTo(index + 1)}
-            aria-label="Foto siguiente"
-            className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/35 backdrop-blur items-center justify-center text-white text-xl transition"
-          >
-            ›
-          </button>
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                aria-label={`Ir a la foto ${i + 1}`}
-                className={`h-2 rounded-full transition-all ${
-                  i === index ? "w-6 bg-color3" : "w-2 bg-white/50 hover:bg-white/75"
-                }`}
-              />
-            ))}
+        <div className="relative z-10 w-full md:w-[48%] px-7 py-12 md:px-12 lg:px-14 md:py-16">
+          <p className="text-primary font-bold text-[10px] tracking-[0.2em] uppercase mb-4 flex items-center gap-2">
+            {eyebrow || "Hecho a mano en Bogotá"} <span>♡</span>
+          </p>
+          <h1 className="font-display font-extrabold text-[40px] sm:text-5xl lg:text-[52px] leading-[1.04] tracking-[-0.035em] max-w-xl">
+            {isDefaultTitle ? (
+              <>Jabones, velas y <span className="text-primary">maquillaje</span> que transforman tu espacio</>
+            ) : title}
+          </h1>
+          <p className="mt-5 text-[14px] sm:text-[15px] leading-7 text-ink-soft max-w-md">
+            {subtitle || "Ingredientes naturales, aromas exclusivos y un pedido tan simple como escribirnos por WhatsApp."}
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/catalogo" className="btn-glossy inline-flex items-center gap-2 bg-primary text-white font-bold px-6 py-3.5 rounded-xl shadow-glossy text-sm">
+              {ctaLabel || "Ver catálogo"} <Icon name="arrow" size={16} />
+            </Link>
+            <Link href="/catalogo" className="inline-flex items-center justify-center border border-black/10 bg-white/80 px-6 py-3.5 rounded-xl font-semibold text-sm hover:bg-white transition">
+              Conócenos
+            </Link>
           </div>
-        </>
-      )}
+          <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-ink-soft">
+            <span className="inline-flex items-center gap-2"><Icon name="leaf" size={15} className="text-[#5D8A77]" /> Ingredientes naturales</span>
+            <span className="inline-flex items-center gap-2"><Icon name="heart" size={15} className="text-primary" /> Hecho con amor</span>
+            <span className="inline-flex items-center gap-2"><Icon name="truck" size={15} className="text-[#6479B8]" /> Envíos a todo el país</span>
+          </div>
+        </div>
+
+        <div className="absolute inset-y-4 right-4 md:right-5 w-full md:w-[56%] pointer-events-none">
+          <div className="absolute inset-0 rounded-[24px] bg-white" />
+          {images.length > 0 ? images.map((src, i) => (
+            <div key={src + i} className="absolute inset-0 transition-opacity duration-700" style={{ opacity: i === index ? 1 : 0 }} aria-hidden={i !== index}>
+              <div className="absolute inset-0 bg-gradient-to-r from-white via-white/35 to-transparent z-[1]" />
+              <Image src={src} alt="Productos de belleza y bienestar" fill priority={i === 0} sizes="(max-width: 768px) 100vw, 60vw" className="object-contain object-right p-3 md:p-5 lg:p-8" />
+            </div>
+          )) : (
+            <div className="absolute inset-0 flex items-center justify-center text-ink-soft/40">Productos de la tienda</div>
+          )}
+        </div>
+
+        {images.length > 1 && (
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+            {images.map((_, i) => <button key={i} onClick={() => setIndex(i)} aria-label={`Ir a la foto ${i + 1}`} className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-primary" : "w-1.5 bg-black/15"}`} />)}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

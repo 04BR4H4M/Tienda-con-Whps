@@ -3,36 +3,8 @@ import Carousel from "@/components/Carousel";
 import AddToCartBox from "@/components/AddToCartBox";
 import { getProductBySlug } from "@/lib/catalog";
 import { formatCOP } from "@/lib/format";
-
-export const revalidate = 0; // siempre trae lo último del panel de administrador
-
-export async function generateMetadata({ params }) {
-  const product = await getProductBySlug(params.slug);
-  return { title: product ? product.name : "Producto no encontrado" };
-}
-
-export default async function ProductoPage({ params }) {
-  const product = await getProductBySlug(params.slug);
-  if (!product) notFound();
-
-  return (
-    <main className="max-w-5xl mx-auto px-5 py-10">
-      <div className="grid md:grid-cols-2 gap-10">
-        <Carousel images={product.images} alt={product.name} />
-
-        <div>
-          <p className="text-accent-dark font-bold text-xs tracking-[0.15em] uppercase">
-            {product.category}
-          </p>
-          <h1 className="font-display font-extrabold text-3xl mt-2">{product.name}</h1>
-          <p className="text-ink-soft text-sm mt-4 leading-relaxed">{product.description}</p>
-          <p className="font-display font-extrabold text-2xl text-primary-dark mt-6">
-            {formatCOP(product.price)}
-          </p>
-
-          <AddToCartBox product={product} />
-        </div>
-      </div>
-    </main>
-  );
-}
+import Icon from "@/components/Icon";
+export const revalidate=0;
+export async function generateMetadata({params}){const product=await getProductBySlug(params.slug);return{title:product?product.name:"Producto no encontrado"};}
+export default async function ProductoPage({params}){const product=await getProductBySlug(params.slug);if(!product)notFound();return <main className="max-w-7xl mx-auto px-5 lg:px-7 py-10 md:py-14"><div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-start"><div className="rounded-[26px] bg-[#FAF9F7] p-4"><Carousel images={product.images} alt={product.name}/></div><div className="pt-2"><p className="text-primary font-bold text-[10px] tracking-[0.18em] uppercase">{product.category}</p><div className="flex items-start justify-between gap-4"><h1 className="font-display font-extrabold text-3xl md:text-4xl mt-2">{product.name}</h1><button className="w-10 h-10 rounded-full border border-black/[0.08] flex items-center justify-center text-ink-soft hover:text-primary hover:bg-color2 transition"><Icon name="heart" size={19}/></button></div><div className="flex items-center gap-1 mt-3 text-[#D9905B]"><span>★★★★★</span><span className="text-[11px] text-ink-soft ml-1">(24 opiniones)</span></div><p className="font-display font-extrabold text-2xl text-primary-dark mt-5">{formatCOP(product.price)}</p><p className="text-ink-soft text-sm mt-4 leading-7 max-w-lg">{product.description}</p><AddToCartBox product={product}/><div className="grid grid-cols-3 gap-2 mt-7"><SmallBenefit icon="truck" text="Envío rápido"/><SmallBenefit icon="shield" text="Compra segura"/><SmallBenefit icon="heart" text="Devoluciones fáciles"/></div></div></div></main>}
+function SmallBenefit({icon,text}){return <div className="rounded-xl bg-[#FAF9F7] border border-black/[0.04] p-3 text-center text-[10px] text-ink-soft"><Icon name={icon} size={16} className="mx-auto mb-1 text-primary"/>{text}</div>}

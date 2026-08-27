@@ -9,29 +9,33 @@ html {
 }
 
 body {
-@apply bg-surface text-ink font-body;
+  @apply bg-white text-ink font-body antialiased;
 }
 
-/* Botón con acabado "glossy" reutilizable en todo el sitio */
-.btn-glossy {
-  @apply relative overflow-hidden font-semibold rounded-lg transition
-         hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:brightness-95;
+::selection {
+  background: #fde2e4;
+  color: #24242c;
 }
+
+.btn-glossy {
+  @apply relative overflow-hidden font-semibold rounded-xl transition duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0;
+}
+
 .btn-glossy::after {
   content: "";
   position: absolute;
-  inset: 0 0 50% 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
+  inset: 0;
+  background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.45) 50%, transparent 80%);
+  transform: translateX(-120%);
+  transition: transform .6s ease;
   pointer-events: none;
 }
 
-/* Elemento de firma: un pequeño divisor en forma de gota de cera, usado
-   bajo los títulos de sección en vez de una simple línea. Referencia
-   directa al nombre de la marca. */
-.wax-divider {
-  width: 34px;
-  height: 14px;
-}
-.wax-divider path {
-  fill: currentColor;
+.btn-glossy:hover::after { transform: translateX(120%); }
+
+.wax-divider { width: 34px; height: 14px; }
+.wax-divider path { fill: currentColor; }
+
+.soft-ring {
+  box-shadow: 0 0 0 8px rgba(253,226,228,.55);
 }
