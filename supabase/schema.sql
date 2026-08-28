@@ -143,9 +143,11 @@ create policy "Solo admins pueden editar la configuración"
 -- ============================================================
 -- 7. Storage: bucket público para las fotos de producto y del hero
 -- ============================================================
-insert into storage.buckets (id, name, public)
-values ('productos', 'productos', true)
-on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('productos', 'productos', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+on conflict (id) do update set
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 create policy "Fotos de productos visibles para todos"
   on storage.objects for select

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { validateImageFile } from "@/lib/validate-image";
 
 function slugify(text) {
   return text
@@ -41,6 +42,16 @@ export default function ProductForm({ mode, product, categories }) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     setError("");
+
+    for (const file of files) {
+      const validationError = validateImageFile(file);
+      if (validationError) {
+        setError(validationError);
+        e.target.value = "";
+        return;
+      }
+    }
+
     setUploading(true);
 
     try {

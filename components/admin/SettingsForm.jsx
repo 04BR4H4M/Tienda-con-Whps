@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { validateImageFile } from "@/lib/validate-image";
 
 export default function SettingsForm({ settings }) {
   const router = useRouter();
@@ -35,6 +36,16 @@ export default function SettingsForm({ settings }) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     setError("");
+
+    for (const file of files) {
+      const validationError = validateImageFile(file);
+      if (validationError) {
+        setError(validationError);
+        e.target.value = "";
+        return;
+      }
+    }
+
     setUploading(true);
 
     try {

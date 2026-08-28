@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { validateImageFile } from "@/lib/validate-image";
 
 export default function CategoryForm({ category }) {
   const router = useRouter();
@@ -21,6 +22,14 @@ export default function CategoryForm({ category }) {
     const file = e.target.files?.[0];
     if (!file) return;
     setError("");
+
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      setError(validationError);
+      e.target.value = "";
+      return;
+    }
+
     setUploading(true);
 
     try {
