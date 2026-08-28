@@ -51,8 +51,8 @@ export default async function HomePage() {
                     <span className="inline-flex items-center gap-1 mt-4 text-[11px] font-bold text-ink-soft group-hover:text-ink transition">Ver productos <Icon name="arrow" size={13} /></span>
                   </div>
                   <div className="absolute right-0 top-0 bottom-0 w-[62%] flex items-center justify-end overflow-hidden">
-                    <Image src={c.image} alt={c.label} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain object-right p-3 md:p-5 group-hover:scale-[1.035] transition duration-500" />
-                    <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-current/5 to-transparent" />
+                    <div className="absolute inset-y-3 inset-x-2 md:inset-x-3 rounded-2xl bg-white" />
+                    <Image src={c.image} alt={c.label} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain object-right p-4 md:p-6 group-hover:scale-[1.035] transition duration-500" />
                   </div>
                 </Link>
               );

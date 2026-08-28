@@ -13,6 +13,7 @@ export default function CategoryForm({ category }) {
   const [image, setImage] = useState(category.image || "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
 
@@ -39,6 +40,10 @@ export default function CategoryForm({ category }) {
     }
   }
 
+  function handleRemoveImage() {
+    setImage("");
+  }
+
   async function handleSave() {
     setError("");
     setSaved(false);
@@ -55,6 +60,48 @@ export default function CategoryForm({ category }) {
       return;
     }
     setSaved(true);
+    router.refresh();
+  }
+
+  async function handleDelete() {
+    setError("");
+    setDeleting(true);
+
+    // Antes de borrar, nos aseguramos de que no queden productos "huérfanos"
+    // apuntando a esta categoría.
+    const { count, error: countError } = await supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("category_slug", category.slug);
+
+    if (countError) {
+      setDeleting(false);
+      setError("No se pudo verificar: " + countError.message);
+      return;
+    }
+
+    if (count > 0) {
+      setDeleting(false);
+      alert(
+        `No puedes eliminar "${category.label}" porque tiene ${count} producto(s) asignado(s). ` +
+          `Cámbialos de categoría o elimínalos primero.`
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(`¿Eliminar la categoría "${category.label}"? No se puede deshacer.`);
+    if (!confirmed) {
+      setDeleting(false);
+      return;
+    }
+
+    const { error: deleteError } = await supabase.from("categories").delete().eq("slug", category.slug);
+
+    setDeleting(false);
+    if (deleteError) {
+      setError("No se pudo eliminar: " + deleteError.message);
+      return;
+    }
     router.refresh();
   }
 
@@ -86,7 +133,7 @@ export default function CategoryForm({ category }) {
           placeholder="Frase corta (opcional)"
           className="w-full border border-black/10 rounded-lg px-3 py-1.5 text-sm"
         />
-        <div className="flex items-center gap-3 pt-1">
+        <div className="flex items-center gap-3 pt-1 flex-wrap">
           <label className="text-xs font-semibold text-primary-dark border border-primary/30 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-surface">
             {uploading ? "Subiendo..." : "Cambiar foto"}
             <input
@@ -97,6 +144,15 @@ export default function CategoryForm({ category }) {
               className="hidden"
             />
           </label>
+          {image && (
+            <button
+              onClick={handleRemoveImage}
+              disabled={uploading}
+              className="text-xs font-semibold text-ink-soft hover:text-red-600"
+            >
+              Quitar foto
+            </button>
+          )}
           <button
             onClick={handleSave}
             disabled={saving || uploading}
@@ -104,8 +160,15 @@ export default function CategoryForm({ category }) {
           >
             {saving ? "Guardando..." : "Guardar"}
           </button>
-          {saved && !error && <span className="text-xs text-primary-dark font-semibold">Guardado ✓</span>}
-          {error && <span className="text-xs text-red-600">{error}</span>}
+          <button
+            onClick={handleDelete}
+            disabled={deleting || saving || uploading}
+            className="text-xs font-semibold text-red-600 hover:underline disabled:opacity-50 ml-auto"
+          >
+            {deleting ? "Eliminando..." : "Eliminar categoría"}
+          </button>
+          {saved && !error && <span className="text-xs text-primary-dark font-semibold w-full">Guardado ✓</span>}
+          {error && <span className="text-xs text-red-600 w-full">{error}</span>}
         </div>
       </div>
     </div>

@@ -59,6 +59,24 @@ create policy "Categorías visibles para todos"
   on categories for select
   using (true);
 
+-- Estas tres políticas faltaban por completo: sin ellas, subir una foto
+-- a Storage funcionaba, pero guardar esa URL en la categoría (o crear /
+-- editar / borrar una categoría) quedaba bloqueado en silencio por RLS.
+create policy "Solo admins pueden insertar categorías"
+  on categories for insert
+  to authenticated
+  with check (true);
+
+create policy "Solo admins pueden editar categorías"
+  on categories for update
+  to authenticated
+  using (true);
+
+create policy "Solo admins pueden borrar categorías"
+  on categories for delete
+  to authenticated
+  using (true);
+
 -- Escritura solo para usuarios autenticados (el/los administrador(es))
 create policy "Solo admins pueden insertar productos"
   on products for insert
