@@ -5,7 +5,16 @@ import { useState } from "react";
 
 export default function Carousel({ images, alt }) {
   const [slide, setSlide] = useState(0);
+  const [zooming, setZooming] = useState(false);
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const move = (dir) => setSlide((s) => (s + dir + images.length) % images.length);
+
+  function handleMouseMove(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomPos({ x, y });
+  }
 
   return (
     <div className="relative aspect-square rounded-xl overflow-hidden bg-surface">
@@ -14,8 +23,26 @@ export default function Carousel({ images, alt }) {
         style={{ transform: `translateX(-${slide * 100}%)` }}
       >
         {images.map((src, i) => (
-          <div key={i} className="relative min-w-full h-full">
+          <div
+            key={i}
+            className="relative min-w-full h-full md:cursor-zoom-in"
+            onMouseEnter={() => setZooming(true)}
+            onMouseLeave={() => setZooming(false)}
+            onMouseMove={handleMouseMove}
+          >
             <Image src={src} alt={`${alt} — foto ${i + 1}`} fill className="object-cover" />
+            {/* Lupa: solo en pantallas con mouse (md+); en móvil no hay "hover" */}
+            {zooming && i === slide && (
+              <div
+                className="hidden md:block absolute inset-0 pointer-events-none"
+                style={{
+                  backgroundImage: `url(${src})`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "220%",
+                  backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                }}
+              />
+            )}
           </div>
         ))}
       </div>

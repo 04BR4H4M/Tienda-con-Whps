@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Carousel from "@/components/Carousel";
 import AddToCartBox from "@/components/AddToCartBox";
@@ -18,6 +19,14 @@ export default async function ProductoPage({ params }) {
 
   return (
     <main className="max-w-7xl mx-auto px-5 lg:px-7 py-10 md:py-14">
+      <Link
+        href="/catalogo"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink transition mb-6"
+      >
+        <Icon name="arrow" size={14} className="rotate-180" />
+        Volver al catálogo
+      </Link>
+
       <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-start">
         <div className="rounded-[26px] bg-white border border-black/[0.04] p-4">
           <Carousel images={product.images} alt={product.name} />
@@ -31,7 +40,9 @@ export default async function ProductoPage({ params }) {
           <p className="font-display font-extrabold text-2xl text-primary-dark mt-5">
             {formatCOP(product.price)}
           </p>
-          <p className="text-ink-soft text-sm mt-4 leading-7 max-w-lg">{product.description}</p>
+          <p className="text-ink-soft text-sm mt-4 leading-7 max-w-lg whitespace-pre-line">
+            {product.description}
+          </p>
 
           <AddToCartBox product={product} />
 
