@@ -27,6 +27,7 @@ export default async function RootLayout({ children }) {
         />
       </head>
       <body>
+        <meta name="google-site-verification" content="qjycENO6YDRJmCAruG2eiMX2_DmzIBE88SsR1v2MdFU" />
         <CartProvider>
           <Header siteName={settings.site_name} categories={categories} />
           {children}
