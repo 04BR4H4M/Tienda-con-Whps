@@ -10,15 +10,59 @@ export const revalidate = 0;
 
 export async function generateMetadata({ params }) {
   const product = await getProductBySlug(params.slug);
-  return { title: product ? product.name : "Producto no encontrado" };
+  if (!product) return { title: "Producto no encontrado" };
+
+  const description = (product.shortDesc || product.description || "").slice(0, 160);
+  const image = product.images?.[0];
+
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical: `/producto/${product.slug}` },
+    openGraph: {
+      type: "website",
+      title: product.name,
+      description,
+      images: image ? [{ url: image, width: 1200, height: 1200, alt: product.name }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
 }
 
 export default async function ProductoPage({ params }) {
   const product = await getProductBySlug(params.slug);
   if (!product) notFound();
 
+  // Datos estructurados del producto: precio, disponibilidad e imagen.
+  // Esto es lo que le permite a Google mostrar el precio y la foto
+  // directamente en el resultado de búsqueda, no solo un link con texto.
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description || product.shortDesc || undefined,
+    image: product.images,
+    category: product.category,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "COP",
+      price: product.price,
+      availability: "https://schema.org/InStock",
+      url: `https://dilustore.com.co/producto/${product.slug}`,
+    },
+  };
+
   return (
     <main className="max-w-7xl mx-auto px-5 lg:px-7 py-10 md:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <Link
         href="/catalogo"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink transition mb-6"
